@@ -8,8 +8,14 @@ npm install react-bootstrap bootstrap react-router-dom react-icons
 ## index.css
 
 ```
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
 :root {
-  --brand : #6f3bff;
+  --brand : var(--bs-primary);
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --heading: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 .text-brand{
@@ -532,14 +538,17 @@ export default function TableProd() {
 ```
 import './Login.css'
 import { useState } from 'react'
-import { Link , useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { FaEyeSlash } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 
 export default function Signin() {
     const navigate = useNavigate();
-    const [users , setUsers] = useState(JSON.parse(localStorage.getItem('users')) || [])
+    const [showPw, setShowPw] = useState(false)
+    const [users, setUsers] = useState(JSON.parse(localStorage.getItem('auth')) || [])
     const [data, setData] = useState({
         email: "",
         password: ""
@@ -547,7 +556,7 @@ export default function Signin() {
     const [error, setError] = useState({
         email: "",
         password: "",
-        auth : ""
+        auth: ""
     })
 
     const handleChange = (e) => {
@@ -560,18 +569,19 @@ export default function Signin() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        let user = users.find(user=> user.email === data.email);
-        if(!user) {
-            setError(prev => ({...prev , auth:'User not found'}))
-            console.log(error)
-            return
-        }
-        if(validate(user)){ 
-            if(user.password === data.password){
+        let user = users.find(user => user.email === data.email);
+        if (validate()) {
+            if (!user) {
+                setError(prev => ({ ...prev, auth: 'User not found' }))
+                console.log(error)
+                return
+            }
+
+            if (user.password === data.password) {
                 localStorage.setItem('loggedIn', JSON.stringify(user))
-                navigate('/')
-            }else{
-                setError(prev => ({...prev , auth:"Password doesn't match"}))
+                navigate('/home')
+            } else {
+                setError(prev => ({ ...prev, auth: "Password doesn't match" }))
             }
         }
     }
@@ -579,12 +589,16 @@ export default function Signin() {
     const validate = () => {
         const emailRegex = /^[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;;
         const error = {};
-        if (!data?.email) error.email = "email required";
-        if(data.email){
-            if (!emailRegex.test(data?.email)) error.email = "not a valid email";
+        if (!data.email || !data.email.trim()) {
+            error.email = "Email required"
+        } else if (!emailRegex.test(data.email)) {
+            error.email = "not a valid email";
         }
-        if (data.password.length < 8) error.password = "Password should be 8 or above characters";
-        if(!data.password) error.password = 'Password Required'
+        if (!data.password || !data.password.trim()) {
+            error.password = 'Password required'
+        } else if (data.password.length < 8) {
+            error.password = "Password should be 8 or above characters";
+        }
 
         setError(error);
         return Object.keys(error).length === 0;
@@ -595,12 +609,15 @@ export default function Signin() {
                 <h3 className='my-3'>Login</h3>
                 <Form.Group className='form-group m-2 text-start'>
                     <Form.Label className='p-2'>Email</Form.Label>
-                    <Form.Control  type='text' name='email' value={data.email} onChange={(e) => handleChange(e)} />
+                    <Form.Control type='text' name='email' value={data.email} onChange={(e) => handleChange(e)} />
                     {error.email && <p className='text-danger'>{error.email}</p>}
                 </Form.Group>
-                <Form.Group className='form-group m-2 text-start'>
+                <Form.Group className='form-group m-2 text-start position-relative'>
                     <Form.Label className='p-2'>Password</Form.Label>
-                    <Form.Control type='password' name='password' value={data.password} onChange={(e) => handleChange(e)} />
+                    <Form.Control type={showPw ? 'text' : 'password'} name='password' value={data.password} onChange={(e) => handleChange(e)} />
+                    {showPw ? <FaEyeSlash onClick={() => setShowPw(!showPw)} className='position-absolute' style={{ right: "10px", bottom: '10px' }} />
+                        : <FaEye onClick={() => setShowPw(!showPw)} className='position-absolute' style={{ right: "10px", bottom: '10px' }} />
+                    }
                     {error.password && <p className='text-danger'>{error.password}</p>}
                 </Form.Group>
                 <Form.Group className='m-2'>
@@ -648,10 +665,15 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
+import { FaEyeSlash } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
+
 import Form from 'react-bootstrap/Form';
 
 export default function Signin() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+
+    const [showPw, setShowPw] = useState(false)
     const [data, setData] = useState({
         name: "",
         email: "",
@@ -674,25 +696,32 @@ export default function Signin() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
-            let users = JSON.parse(localStorage.getItem('users')) || [];
+            let users = JSON.parse(localStorage.getItem('auth')) || [];
             console.log(users)
             users.push(data)
-            localStorage.setItem('users', JSON.stringify(users))
+            localStorage.setItem('auth', JSON.stringify(users))
             setData({
                 name: "",
                 email: "",
                 password: ""
             })
-            navigate('/login')
+            navigate('/')
         }
     }
     const validate = () => {
-       const emailRegex = /^[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;;
-         const error = {};
-        if (!data.name) error.name = "Name required";
-        if (!data.email) error.email = "email required";
-        if (!emailRegex.test(data.email)) error.email = "not a valid email";
-        if (data.password.length < 8) error.password = "Password should be 8 or above characters";
+        const emailRegex = /^[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;;
+        const error = {};
+        if (!data.name || !data.name.trim()) error.name = "Name required";
+        if (!data.email || !data.name.trim()) {
+            error.email = "Email required"
+        } else if (!emailRegex.test(data.email)) {
+            error.email = "not a valid email";
+        }
+        if (!data.password || !data.password.trim()) {
+            error.password = 'Password required'
+        } else if (data.password.length < 8) {
+            error.password = "Password should be 8 or above characters";
+        }
 
         setError(error);
         console.log(error);
@@ -712,14 +741,17 @@ export default function Signin() {
                     <Form.Control type='text' name='email' value={data.email} onChange={(e) => handleChange(e)} />
                     {error.email && <p className='text-danger'>{error.email}</p>}
                 </Form.Group>
-                <Form.Group className='form-group m-2 text-start'>
+                <Form.Group className='form-group m-2 text-start position-relative'>
                     <Form.Label className='p-2'>Password</Form.Label>
-                    <Form.Control type='password' name='password' value={data.password} onChange={(e) => handleChange(e)} />
+                    <Form.Control type={showPw ? 'text' : 'password'} name='password' value={data.password} onChange={(e) => handleChange(e)} />
+                    { showPw ? <FaEyeSlash onClick={()=>setShowPw(!showPw)} className='position-absolute' style={{right:"10px", bottom:'10px'}}/>
+                        : <FaEye onClick={()=>setShowPw(!showPw)} className='position-absolute' style={{right:"10px", bottom:'10px'}}/>
+                    }
                     {error.password && <p className='text-danger'>{error.password}</p>}
                 </Form.Group>
                 <Form.Group className='m-2'>
                     <button type='submit' className='w-100 btn btn-primary'>Submit</button>
-                    <Form.Text>Already signed up login here <Link to='/login'>here</Link></Form.Text>
+                    <Form.Text>Already signed up login here <Link to='/'>here</Link></Form.Text>
                 </Form.Group>
             </Form>
         </section>
