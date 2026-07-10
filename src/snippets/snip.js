@@ -1,4 +1,4 @@
-const categories = ['All snippets', 'Commands', 'Components', 'Pages', 'Layout', 'Utilities']
+const categories = ['All snippets', 'Commands', 'Components', 'Pages', 'Features', 'Layout', 'Utilities']
 
 export const snippets = [
     {
@@ -19,10 +19,21 @@ export const snippets = [
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --brand : var(--bs-primary);
   --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --heading: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+`,
+    },
+    {
+        id: 'custom-brand-theme-bootstrap',
+        title: 'Custom Bootstrap Theme',
+        language: 'CSS',
+        category: 'Layout',
+        description: 'Custom Bootstrap Theme',
+        code: ` 
+:root {
+  --brand : var(--bs-primary);
 }
 
 .text-brand{
@@ -50,16 +61,6 @@ export const snippets = [
     --bs-btn-hover-color:white;
     --bs-btn-active-color:white;
 }
-
-.page{
-    background-color: #f6f5fd;
-    height: 100vh;
-}
-
-input , select{
-    color: black;
-    background-color: #f6f5fd;
-} 
 `,
     },
     {
@@ -148,6 +149,18 @@ export const AppProvider = ({ children }) => {
     </ContentContext.Provider>
   );
 };
+`,
+    },
+    {
+        id: 'length-reducer',
+        title: 'Length Reducer',
+        language: 'JavaScript',
+        category: 'Utilities',
+        description: 'Length Reducer',
+        code: `
+export function reduceLength(text, len) {
+    return !len ? text : text.length <= len ? text : text.slice(0, len) + "..."
+}
 `,
     },
     {
@@ -412,6 +425,59 @@ export default function Login() {
         width: 100%;
     }
 }`,
+    },
+    {
+        id: 'responsive-cards-dashBoard',
+        title: 'Responsive Cards DashBoard',
+        language: 'JavaScript',
+        category: 'Pages',
+        description: 'Responsive Cards DashBoard',
+        code: `
+import { FaUsers } from "react-icons/fa";
+import { FaDropbox } from "react-icons/fa";
+import { FaBox } from "react-icons/fa";
+import { BsCashCoin } from "react-icons/bs";
+
+import { Card, Row } from 'react-bootstrap'
+import { useProduct, useUser } from '../context/context'
+
+export default function Dash() {
+    const { users } = useUser();
+    const { products } = useProduct()
+    return (
+        <Row className="w-100 gap-2 m-4 h-100">
+            <Card style={{ width: '18rem'}} className="col-12 col-md-6 col-lg-3 mx-auto">
+                <Card.Body>
+                    <FaUsers />
+                    <Card.Title>Total cart</Card.Title>
+                    <Card.Text>{users.length}</Card.Text>
+                </Card.Body>
+            </Card>
+            <Card style={{ width: '18rem'}} className="col-12 col-md-6 col-lg-3 mx-auto">
+                <Card.Body>
+                    <FaUsers />
+                    <Card.Title>Total products</Card.Title>
+                    <Card.Text>{products.length}</Card.Text>
+                </Card.Body>
+            </Card>
+            <Card style={{ width: '18rem'}} className="col-12 col-md-6 col-lg-3 mx-auto">
+                <Card.Body>
+                    <FaUsers />
+                    <Card.Title>Total orders</Card.Title>
+                    <Card.Text>0</Card.Text>
+                </Card.Body>
+            </Card>
+            <Card style={{ width: '18rem'}} className="col-12 col-md-6 col-lg-3 mx-auto">
+                <Card.Body>
+                    <FaUsers />
+                    <Card.Title>Total Revenue</Card.Title>
+                    <Card.Text>0</Card.Text>
+                </Card.Body>
+            </Card>
+        </Row>
+    )
+}
+`,
     },
     {
         id: 'form',
@@ -1418,7 +1484,6 @@ ul a:hover {
         category: 'Components',
         description: 'Footer',
         code: `
-
 import React from 'react'
 import { IoLocationOutline } from "react-icons/io5";
 import { FaPhoneAlt } from "react-icons/fa";
@@ -1485,14 +1550,66 @@ function Footer() {
 export default Footer
   `,
     },
-     {
+    {
+        id: 'Product Card',
+        title: 'Product Card',
+        language: 'JavaScript',
+        category: 'Components',
+        description: 'Product Card',
+        code: `
+import { Badge, Card, Button } from 'react-bootstrap'
+
+
+import { useCart } from '../context/context'
+import { reduceLength } from '../utils/len'
+
+
+export default function ProductCard({ product }) {
+    const { cart, setCart } = useCart()
+
+    function AddCart(product) {
+        setCart(prev => [{ ...product, price: Number(product.price), qty: 1 }, ...prev,])
+    }
+    return (
+        <Card key={product.id} style={{ width: '14rem' }} className='text-start'>
+            <Card.Img
+                variant="top"
+                src={product.image}
+                style={{
+                    height: "200px",
+                    width: "100%",
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    backgroundColor: "#f8f9fa"
+                }}
+            />
+
+            <Card.Body className='d-flex flex-column justify-content-between'>
+                <div>
+                    <Card.Title style={{ fontSize: "20px" }}>{reduceLength(product.title, 24)}</Card.Title>
+                    <Badge bg="success">{product.category}</Badge>
+                </div>
+                <div>
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <Card.Text className='mb-0'>
+                            $ {product.price}
+                        </Card.Text>
+                        <Button variant="primary" onClick={() => AddCart(product)}>Add to Cart</Button>
+                    </div>
+                </div>
+            </Card.Body>
+        </Card>
+    )
+}
+    `,
+    },
+    {
         id: 'Cart',
         title: 'Cart',
         language: 'JavaScript',
         category: 'Components',
         description: 'Cart',
         code: `
-
 import { Badge, Card, Button } from 'react-bootstrap'
 
 
