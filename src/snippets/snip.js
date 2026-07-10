@@ -1551,7 +1551,7 @@ export default Footer
   `,
     },
     {
-        id: 'Product Card',
+        id: 'Product-Card',
         title: 'Product Card',
         language: 'JavaScript',
         category: 'Components',
@@ -1604,57 +1604,221 @@ export default function ProductCard({ product }) {
     `,
     },
     {
-        id: 'Cart',
-        title: 'Cart',
+        id: 'Pagination',
+        title: 'Pagination',
         language: 'JavaScript',
-        category: 'Components',
-        description: 'Cart',
+        category: 'Features',
+        description: 'Pagination',
         code: `
-import { Badge, Card, Button } from 'react-bootstrap'
 
+const [active, setActive] = useState(0)
+const [offset, setOffset] = useState(0);
+const [limit, setLimit] = useState(5);
+const [perPage, setPerPage] = useState(limit)
 
-import { useCart } from '../context/context'
-import { reduceLength } from '../utils/len'
+useEffect(() => {
+    setPerPage(limit)
+}, [limit])
 
-
-export default function ProductCard({ product }) {
-    const { cart, setCart } = useCart()
-
-    function AddCart(product) {
-        setCart(prev => [{ ...product, price: Number(product.price), qty: 1 }, ...prev,])
-    }
-    return (
-        <Card key={product.id} style={{ width: '14rem' }} className='text-start'>
-            <Card.Img
-                variant="top"
-                src={product.image}
-                style={{
-                    height: "200px",
-                    width: "100%",
-                    objectFit: "contain",
-                    objectPosition: "center",
-                    backgroundColor: "#f8f9fa"
-                }}
-            />
-
-            <Card.Body className='d-flex flex-column justify-content-between'>
-                <div>
-                    <Card.Title style={{ fontSize: "20px" }}>{reduceLength(product.title, 24)}</Card.Title>
-                    <Badge bg="success">{product.category}</Badge>
+return <>
+ {rendingData?.length > 0 ? rendingData.map(((product, i) => {
+                        return i >= offset && i < perPage ? <tr key={product.id}>
+                            <td>{product.id}</td>
+                            <td style={{ width: "200px", height: "100px" }} ><img src={product?.images[0]} style={{
+                                height: "200px",
+                                width: "100%",
+                                objectFit: "contain",
+                                objectPosition: "center",
+                                backgroundColor: "#f8f9fa"
+                            }} /></td>
+                            <td>{reduceLength(product.title, 34)}</td>
+                            {/* <td>{product.category}</td>
+                            <td style={{ width: "500px" }}>{product.brand}</td> */}
+                            <td>{product.stock}</td>
+                            <td>$ {product.price}</td>
+                            <td>
+                                <Button className='bg-success text-white m-2' onClick={() => openShowModel(product.id)}><FaEye /></Button>
+                                <Button className='bg-warning text-white m-2' onClick={() => openEditModel(product.id)}><BiSolidEdit /></Button>
+                                <Button className='btn-danger m-2' onClick={() => openDeleteModel(product.id)}><MdDelete /></Button>
+                            </td>
+                        </tr> : ""
+                    })) : <tr><td colSpan={6}>No Data Found</td></tr>
+                                 <section className='w-100 d-flex justify-content-end gap-2 '>
+                <Dropdown className='mx-2'>
+                    <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center p-2 bg-primary text-white border-0">
+                        {limit}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => {
+                            setLimit(5)
+                            setOffset(0)
+                            setActive(0)
+                        }}>5</Dropdown.Item>
+                        <Dropdown.Item onClick={() => {
+                            setLimit(10)
+                            setOffset(0)
+                            setActive(0)
+                        }}>10</Dropdown.Item>
+                        <Dropdown.Item onClick={() => {
+                            setLimit(15)
+                            setOffset(0)
+                            setActive(0)
+                        }}>15</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+                <div className='d-flex gap-2 mb-3'>
+                    <Button className='btn-light text-primary'> <MdOutlineKeyboardArrowLeft/> </Button>
                 </div>
-                <div>
-                    <div className='d-flex justify-content-between align-items-center'>
-                        <Card.Text className='mb-0'>
-                            $ {product.price}
-                        </Card.Text>
-                        <Button variant="primary" onClick={() => AddCart(product)}>Add to Cart</Button>
-                    </div>
+                <Pagination>
+
+                    {Array.from({ length: Math.ceil(filteredProducts?.length / limit) }).map((_, i) => {
+                        const pageNumber = i;
+                        return (
+                            <Pagination.Item
+                                key={pageNumber}
+                                active={pageNumber === active}
+                                onClick={() => {
+                                    setOffset(pageNumber * limit)
+                                    setPerPage((pageNumber * limit) + limit)
+                                    setActive(pageNumber)
+                                }
+                                }
+                            >
+                                {pageNumber + 1}
+                            </Pagination.Item>
+                        );
+                    })}
+                </Pagination>
+                <div className='d-flex gap-2 mb-3'>
+                    <Button className='btn-light text-primary'> <MdOutlineKeyboardArrowRight/> </Button>
                 </div>
-            </Card.Body>
-        </Card>
-    )
-}
+
+            </section>
+    </>
     `,
+    },
+    {
+        id: 'search-advanced-search',
+        title: 'Search-advanced-search',
+        language: 'JavaScript',
+        category: 'Features',
+        description: 'Search-advanced-search',
+        code: `
+    const [search, setSearch] = useState('');
+    const [filteredProducts, setFilteredProducts] = useState(products)
+    const [searchProd, setSearchProd] = useState({
+        title: "",
+        brand: "",
+        category: "",
+        price: ""
+    })
+    const [advShow, setAdvShow] = useState(false);
+
+        const handleSearch = () => {
+        if (search.length == 0) {
+            setFilteredProducts(products)
+        } else {
+            setFilteredProducts(products)
+            setFilteredProducts(prev =>
+                prev.filter(item => Object.values(item).join('').toLowerCase().includes(search.toLowerCase()))
+            )
+        }
+    }
+
+    const handleAdvChange = (e) => {
+        setSearchProd(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    }
+
+    const handleAdvSearch = (e) => {
+        e.preventDefault();
+        setFilteredProducts(products)
+        setFilteredProducts(prev =>
+            prev.filter(item => {
+                return Object.keys(searchProd).every(key => {
+                    const query = searchProd[key].trim().toLowerCase();
+                    if (!query) return true;
+
+                    const value = item[key] ? item[key].toString().toLowerCase() : "";
+                    return value.includes(query);
+                });
+            })
+        );
+    };
+    const resetAdv = () => {
+        setFilteredProducts(products);
+        setSearchProd({
+            title: "",
+            brand: "",
+            category: "",
+            price: ""
+        })
+    }
+
+    useEffect(() => {
+        handleSearch()
+    }, [search])
+
+    useEffect(() => {
+        setFilteredProducts(products)
+    }, [products])
+
+    return (
+    <>
+    <div className='d-flex justify-content-between mb-4'>
+        <div className='d-flex gap-4'>
+            <div className='position-relative'>
+                <CiSearch className='position-absolute' style={{ left: "8px", top: '23px' }} />
+                <input type='text' value={search} onChange={(e) => setSearch(e.target.value)} className='form-control rounded ps-4 my-2' placeholder='search' />
+            </div>
+            <Button variant="primary" className='m-2 cus-ani' onClick={() => setAdvShow(!advShow)}>
+                <div className='d-flex gap-2'>
+                    <GoStack className='m-1' /> AdvanceSearch
+                </div>
+            </Button>
+        </div>
+    </div>
+    <Collapse in={advShow}>
+        <div className='border rounded-3 my-4 p-2 text-start '>
+            <Form onSubmit={(e) => handleAdvSearch(e)}>
+                <Form.Group className='row py-2'>
+                    {/* <Form.Group className='form-group col-12 col-md-2'>
+                                <Form.Label className='mb-2'>user ID</Form.Label>
+                                <Form.Control type='number' name='id' value={searchProd.id} onChange={(e) => handleAdvChange(e)} />
+                            </Form.Group> */}
+                    <Form.Group className='form-group col-12 col-md-2'>
+                        <Form.Label className='mb-2'>Title</Form.Label>
+                        <Form.Control type='text' name='title' value={searchProd.title} onChange={(e) => handleAdvChange(e)} />
+                    </Form.Group>
+                    <Form.Group className='form-group col-12 col-md-2'>
+                        <Form.Label className='mb-2'>Category</Form.Label>
+                        <Form.Control type='text' name='category' value={searchProd.category} onChange={(e) => handleAdvChange(e)} />
+                    </Form.Group>
+                    <Form.Group className='form-group col-12 col-md-2'>
+                        <Form.Label className='mb-2'>Brand</Form.Label>
+                        <Form.Control type='text' name='brand' value={searchProd.brand} onChange={(e) => handleAdvChange(e)} />
+                    </Form.Group>
+                    <Form.Group className='form-group col-12 col-md-2'>
+                        <Form.Label className='mb-2'>Price</Form.Label>
+                        <Form.Control type='number' name='price' value={searchProd.price} onChange={(e) => handleAdvChange(e)} />
+                    </Form.Group>
+                    <Form.Group className='form-group col-12 col-md-2'>
+                        <div className='d-flex h-100 justify-content-center align-items-end'>
+                            <Button variant="secondary" className='mx-2' type='button' onClick={() => resetAdv()}>
+                                Reset
+                            </Button>
+                            <div className='position-relative'>
+                                <CiSearch className='position-absolute text-white' style={{ left: "16px", top: '12px' }} />
+                                <Button variant="success" className='mx-2 ps-4' type='submit'>Search</Button>
+                            </div>
+                        </div>
+
+                    </Form.Group>
+                </Form.Group>
+            </Form>
+        </div>
+    </Collapse>
+    </>
+     `,
     },
 
 ]

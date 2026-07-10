@@ -15,7 +15,7 @@ import {
 } from 'react-icons/fi'
 import './App.css'
 
-const categories = ['All snippets','Commands' ,'Components','Auth' , 'Pages' , 'Layout', 'Utilities']
+const categories = ['All snippets', 'Commands', 'Components', 'Auth', 'Features', 'Pages', 'Layout', 'Utilities']
 
 function App() {
   const [activeCategory, setActiveCategory] = useState('All snippets')
@@ -47,13 +47,13 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="site-header" style={{backgroundColor:'#712cf9'}}>
+      <header className="site-header" style={{ backgroundColor: '#712cf9' }}>
         <a className="brand" href="/" aria-label="Snipper home">
           <span className="brand-mark">
-            <img src='rb.svg'/>
+            <img src='rb.svg' />
           </span>
           <span>
-            <strong style={{color:"white"}}>Bootstrap Snippets</strong>
+            <strong style={{ color: "white" }}>Bootstrap Snippets</strong>
           </span>
         </a>
 
