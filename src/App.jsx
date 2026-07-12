@@ -2,6 +2,7 @@ import { BrowserRouter, Link, NavLink, Navigate, Route, Routes } from 'react-rou
 import Featured from './snippets/featured.mdx'
 import Commands from './snippets/categories/commands.mdx'
 import Components from './snippets/categories/components.mdx'
+import Handle from './snippets/categories/handle.mdx'
 import Auth from './snippets/categories/auth.mdx'
 import Pages from './snippets/categories/pages.mdx'
 import Layout from './snippets/categories/layout.mdx'
@@ -13,6 +14,7 @@ const navItems = [
   { to: '/category/commands', label: 'Commands' },
   { to: '/category/components', label: 'Components' },
   { to: '/category/auth', label: 'Auth' },
+  { to: '/category/handle', label:'handle'},
   { to: '/category/pages', label: 'Pages' },
   { to: '/category/layout', label: 'Layout' },
   { to: '/category/utilities', label: 'Utilities' },
@@ -50,6 +52,7 @@ function App() {
             <Route path="/category/commands" element={<Commands />} />
             <Route path="/category/components" element={<Components />} />
             <Route path="/category/auth" element={<Auth />} />
+            <Route path='/category/handle' element={<Handle/>}/>
             <Route path="/category/pages" element={<Pages />} />
             <Route path="/category/layout" element={<Layout />} />
             <Route path="/category/utilities" element={<Utilities />} />
