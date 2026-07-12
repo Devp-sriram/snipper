@@ -1,59 +1,33 @@
-import { useMemo, useState } from 'react'
-import { snippets } from './snippets/snip'
-import {
-  FiBox,
-  FiCheck,
-  FiClipboard,
-  FiCode,
-  FiCopy,
-  FiDatabase,
-  FiFileText,
-  FiHash,
-  FiLayers,
-  FiSearch,
-  FiTerminal,
-} from 'react-icons/fi'
+import { BrowserRouter, Link, NavLink, Navigate, Route, Routes } from 'react-router-dom'
+import Featured from './snippets/featured.mdx'
+import Commands from './snippets/categories/commands.mdx'
+import Components from './snippets/categories/components.mdx'
+import Auth from './snippets/categories/auth.mdx'
+import Pages from './snippets/categories/pages.mdx'
+import Layout from './snippets/categories/layout.mdx'
+import Utilities from './snippets/categories/utilities.mdx'
 import './App.css'
 
-const categories = ['All snippets', 'Commands', 'Components', 'Auth', 'Features', 'Pages', 'Layout', 'Utilities']
+const navItems = [
+  { to: '/', label: 'Featured', end: true },
+  { to: '/category/commands', label: 'Commands' },
+  { to: '/category/components', label: 'Components' },
+  { to: '/category/auth', label: 'Auth' },
+  { to: '/category/pages', label: 'Pages' },
+  { to: '/category/layout', label: 'Layout' },
+  { to: '/category/utilities', label: 'Utilities' },
+]
 
 function App() {
-  const [activeCategory, setActiveCategory] = useState('All snippets')
-  const [query, setQuery] = useState('')
-  const [copiedId, setCopiedId] = useState('')
-
-  const filteredSnippets = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-
-    return snippets.filter((snippet) => {
-      const categoryMatches =
-        activeCategory === 'All snippets' || snippet.category === activeCategory
-      const queryMatches =
-        !normalizedQuery ||
-        [snippet.title, snippet.language, snippet.category, snippet.description]
-          .join(' ')
-          .toLowerCase()
-          .includes(normalizedQuery)
-
-      return categoryMatches && queryMatches
-    })
-  }, [activeCategory, query])
-
-  const copySnippet = async (snippet) => {
-    await navigator.clipboard.writeText(snippet.code)
-    setCopiedId(snippet.id)
-    window.setTimeout(() => setCopiedId(''), 1600)
-  }
-
   return (
     <div className="app-shell">
-      <header className="site-header" style={{ backgroundColor: '#712cf9' }}>
+      <header className="site-header" style={{backgroundColor:'#712cf9'}}>
         <a className="brand" href="/" aria-label="Snipper home">
           <span className="brand-mark">
-            <img src='rb.svg' />
+            <img src='rb.svg'/>
           </span>
           <span>
-            <strong style={{ color: "white" }}>Bootstrap Snippets</strong>
+            <strong style={{color:"white"}}>Bootstrap Snippets</strong>
           </span>
         </a>
 
@@ -85,92 +59,22 @@ function App() {
               </button>
             ))}
           </nav>
-
-          <div className="sidebar-panel">
-            <FiFileText aria-hidden="true" />
-            <p>Duplicate the template in <code>src/App.jsx</code> and replace the fields.</p>
-          </div>
         </aside>
 
-        <main className="main-content">
-          <section className="page-title" aria-labelledby="page-heading">
-            <div>
-              <p className="eyebrow">Snippet Library</p>
-              <h1 id="page-heading">Store, scan, and copy your best code snippets.</h1>
-            </div>
-            <div className="stats-grid" aria-label="Snippet stats">
-              <span>
-                <FiLayers aria-hidden="true" />
-                {snippets.length} snippets
-              </span>
-              <span>
-                <FiDatabase aria-hidden="true" />
-                {categories.length - 1} groups
-              </span>
-            </div>
-          </section>
-
-          <section className="snippet-grid" aria-label="Snippet results">
-            {filteredSnippets.map((snippet) => (
-              <article className="snippet-card" key={snippet.id}>
-                <div className="snippet-card-header">
-                  <div>
-                    <span className="language-pill">{snippet.language}</span>
-                    <h2>{snippet.title}</h2>
-                    <p>{snippet.description}</p>
-                  </div>
-                  <button
-                    className={copiedId === snippet.id ? 'copy-button copied' : 'copy-button'}
-                    type="button"
-                    onClick={() => copySnippet(snippet)}
-                    aria-label={`Copy ${snippet.title}`}
-                    title={`Copy ${snippet.title}`}
-                  >
-                    {copiedId === snippet.id ? <FiCheck aria-hidden="true" /> : <FiCopy aria-hidden="true" />}
-                  </button>
-                </div>
-
-                <pre>
-                  <code className='home-cards'>{snippet.code}</code>
-                </pre>
-              </article>
-            ))}
-          </section>
-
-          <section className="template-section" aria-labelledby="template-heading">
-            <div className="template-copy">
-              <FiClipboard aria-hidden="true" />
-              <div>
-                <p className="eyebrow">Add Your Own</p>
-                <h2 id="template-heading">Snippet template</h2>
-                <p>Paste this object into the <code>snippets</code> array and edit the values.</p>
-              </div>
-            </div>
-            <pre>
-              <code>{`{
-  id: 'unique-snippet-id',
-  title: 'Snippet Title',
-  language: 'JavaScript',
-  category: 'Utilities',
-  description: 'Short note about when to use this snippet.',
-  code: \`paste your code here\`,
-},`}</code>
-            </pre>
-          </section>
+        <main className="doc-content">
+          <Routes>
+            <Route path="/" element={<Featured />} />
+            <Route path="/category/commands" element={<Commands />} />
+            <Route path="/category/components" element={<Components />} />
+            <Route path="/category/auth" element={<Auth />} />
+            <Route path="/category/pages" element={<Pages />} />
+            <Route path="/category/layout" element={<Layout />} />
+            <Route path="/category/utilities" element={<Utilities />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
       </div>
-
-      <footer className="site-footer">
-        <span>
-          <FiTerminal aria-hidden="true" />
-          Built for manual snippet curation
-        </span>
-        <span>
-          <FiBox aria-hidden="true" />
-          Edit snippets in <code>src/App.jsx</code>
-        </span>
-      </footer>
-    </div>
+    </BrowserRouter>
   )
 }
 

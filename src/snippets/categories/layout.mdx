@@ -1,0 +1,53 @@
+# Layout
+
+Use layout snippets for root styles, Bootstrap imports, and app-level routing.
+
+## Root CSS variables
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --brand: var(--bs-primary);
+  --sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --mono: 'SFMono-Regular', Consolas, monospace;
+}
+
+.text-brand {
+  color: var(--brand);
+}
+
+.bg-brand,
+.btn-brand {
+  background-color: var(--brand);
+  color: white;
+}
+
+.page {
+  min-height: 100vh;
+  background-color: #f6f5fd;
+}
+```
+
+## Nested route setup
+
+```jsx
+import 'bootstrap/dist/css/bootstrap.min.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Admin from './pages/Admin'
+import TableProd from './pages/TableProd'
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />}>
+          <Route index element={<TableProd />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
+}
+```

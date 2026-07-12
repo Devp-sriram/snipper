@@ -1,0 +1,61 @@
+# Components
+
+Use component snippets for reusable UI pieces that can move between pages.
+
+## Header with offcanvas menu
+
+```jsx
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Button, Dropdown, Offcanvas } from 'react-bootstrap'
+import { FaUserCircle } from 'react-icons/fa'
+import { HiOutlineMenu } from 'react-icons/hi'
+
+export default function Header() {
+  const [show, setShow] = useState(false)
+  const [creds, setCreds] = useState({})
+
+  useEffect(() => {
+    setCreds(JSON.parse(localStorage.getItem('loggedIn')) || {})
+  }, [])
+
+  return (
+    <header className="d-flex px-4 p-3 justify-content-between border">
+      <Button className="hamburger btn btn-light" onClick={() => setShow(true)}><HiOutlineMenu /></Button>
+      <h2 className="mb-0 text-brand">Admin console</h2>
+      <Offcanvas show={show} onHide={() => setShow(false)}>
+        <Offcanvas.Body>
+          <Link to="/home" onClick={() => setShow(false)}>Home</Link>
+          <Link to="/home/users" onClick={() => setShow(false)}>Users</Link>
+          <Link to="/home/products" onClick={() => setShow(false)}>Products</Link>
+        </Offcanvas.Body>
+      </Offcanvas>
+      <Dropdown>
+        <Dropdown.Toggle variant="light"><FaUserCircle /> {creds?.name}</Dropdown.Toggle>
+        <Dropdown.Menu>
+          <Dropdown.Item href="/">Logout</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+    </header>
+  )
+}
+```
+
+## Sidebar links
+
+```jsx
+import { Link } from 'react-router-dom'
+import './SideBar.css'
+
+export default function Sidebar() {
+  return (
+    <aside className="border-end aside">
+      <ul className="list-unstyled m-3 text-brand">
+        <Link to="/home"><li className="w-100 p-2 text-start">Home</li></Link>
+        <Link to="/home/users"><li className="w-100 p-2 text-start">Users</li></Link>
+        <Link to="/home/products"><li className="w-100 p-2 text-start">Products</li></Link>
+      </ul>
+    </aside>
+  )
+}
+```

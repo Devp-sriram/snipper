@@ -1,0 +1,68 @@
+# Auth
+
+Use auth snippets for local demo login and sign-in flows. These examples use localStorage, so they are suitable for practice projects and prototypes.
+
+## Sign in form
+
+```jsx
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import Form from 'react-bootstrap/Form'
+
+export default function Signin() {
+  const navigate = useNavigate()
+  const [data, setData] = useState({ name: '', email: '', password: '' })
+  const [error, setError] = useState({})
+
+  const handleChange = ({ target }) => {
+    setData((current) => ({ ...current, [target.name]: target.value.trim() }))
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    const users = JSON.parse(localStorage.getItem('auth')) || []
+    localStorage.setItem('auth', JSON.stringify([...users, data]))
+    navigate('/')
+  }
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Form.Control name="name" value={data.name} onChange={handleChange} />
+      {error.name && <p className="text-danger">{error.name}</p>}
+      <Form.Control name="email" value={data.email} onChange={handleChange} />
+      {error.email && <p className="text-danger">{error.email}</p>}
+      <Form.Control name="password" type="password" value={data.password} onChange={handleChange} />
+      {error.password && <p className="text-danger">{error.password}</p>}
+      <button className="btn btn-primary w-100">Submit</button>
+      <Form.Text>Already signed up? <Link to="/">Login</Link></Form.Text>
+    </Form>
+  )
+}
+```
+
+## Auth form CSS
+
+```css
+.outbox {
+  min-height: 100vh;
+  background: linear-gradient(90deg, #7dff9d 0%, #7dfce7 100%);
+}
+
+.box {
+  width: 25%;
+  height: fit-content;
+  background-color: white;
+}
+
+@media screen and (width < 1024px) {
+  .box {
+    width: 50%;
+  }
+}
+
+@media screen and (width < 768px) {
+  .box {
+    width: 100%;
+  }
+}
+```

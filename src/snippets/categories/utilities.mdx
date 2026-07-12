@@ -1,0 +1,46 @@
+# Utilities
+
+Use utility snippets for shared providers, small helpers, and reusable logic.
+
+## Context provider with localStorage
+
+```jsx
+import { createContext, useContext, useEffect, useState } from 'react'
+
+const CartContext = createContext()
+const ProductContext = createContext()
+const OrderContext = createContext()
+
+export const useCart = () => useContext(CartContext)
+export const useProduct = () => useContext(ProductContext)
+export const useOrder = () => useContext(OrderContext)
+
+export function AppProvider({ children }) {
+  const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')) || [])
+  const [orders, setOrders] = useState(JSON.parse(localStorage.getItem('orders')) || [])
+  const [products, setProducts] = useState(JSON.parse(localStorage.getItem('products')) || [])
+
+  useEffect(() => localStorage.setItem('cart', JSON.stringify(cart)), [cart])
+  useEffect(() => localStorage.setItem('orders', JSON.stringify(orders)), [orders])
+  useEffect(() => localStorage.setItem('products', JSON.stringify(products)), [products])
+
+  return (
+    <CartContext.Provider value={{ cart, setCart }}>
+      <ProductContext.Provider value={{ products, setProducts }}>
+        <OrderContext.Provider value={{ orders, setOrders }}>
+          {children}
+        </OrderContext.Provider>
+      </ProductContext.Provider>
+    </CartContext.Provider>
+  )
+}
+```
+
+## Trim long text
+
+```js
+export function reduceLength(value, max = 34) {
+  if (!value || value.length <= max) return value
+  return `${value.slice(0, max).trim()}...`
+}
+```

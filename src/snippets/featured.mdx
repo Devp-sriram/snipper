@@ -1,0 +1,30 @@
+# Bootstrap Snippets
+
+A documentation-style collection of Bootstrap and React snippets. Use the sidebar to open a category page.
+
+The home page stays short and only shows the most common starting points.
+
+## Install the common packages
+
+```sh
+npm install react-bootstrap bootstrap react-router-dom react-icons
+```
+
+## Basic router setup
+
+```jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Dashboard from './pages/Dashboard'
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+```

@@ -1,0 +1,60 @@
+# Pages
+
+Use page snippets when the code owns a complete screen workflow, such as forms, tables, modals, or pagination.
+
+## Product form page
+
+```jsx
+import { useEffect, useState } from 'react'
+import { Form } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
+import { useProduct } from '../context/context'
+
+export default function Product() {
+  const navigate = useNavigate()
+  const { setProducts } = useProduct()
+  const [count, setCount] = useState(Number(JSON.parse(localStorage.getItem('count'))) || 30)
+  const [product, setProduct] = useState({ id: '', title: '', image: '', description: '', category: '', price: 0 })
+  const [error, setError] = useState({})
+
+  const handleChange = ({ target }) => {
+    setProduct((current) => ({ ...current, [target.name]: target.value }))
+  }
+
+  const validate = () => {
+    const nextError = {}
+    if (!product.title.trim()) nextError.title = 'Title required'
+    if (!product.image.trim()) nextError.image = 'Image url required'
+    if (!product.category.trim()) nextError.category = 'Category required'
+    setError(nextError)
+    return Object.keys(nextError).length === 0
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    if (!validate()) return
+    setProducts((current) => [product, ...current])
+    setCount((current) => current + 1)
+    navigate('/admin')
+  }
+
+  useEffect(() => {
+    setProduct((current) => ({ ...current, id: count + 1 }))
+  }, [count])
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Form.Control name="title" value={product.title} onChange={handleChange} />
+      {error.title && <p className="text-danger">{error.title}</p>}
+      <Form.Control name="image" value={product.image} onChange={handleChange} />
+      <Form.Select name="category" value={product.category} onChange={handleChange}>
+        <option value="">Select Category</option>
+        <option>Mens Clothes</option>
+        <option>Womens Fashions</option>
+        <option>Electronics</option>
+      </Form.Select>
+      <button className="btn btn-primary">Save</button>
+    </Form>
+  )
+}
+```

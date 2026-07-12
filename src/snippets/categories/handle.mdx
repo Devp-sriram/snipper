@@ -1,0 +1,80 @@
+# Handle functions
+
+Use handle snippets for local demo Handle functions flows. These examples use localStorage, so they are suitable for practice projects and prototypes.
+
+## HandleChange
+
+
+```jsx
+ const handleChange = (e) => {
+        const { name, value } = e.target;
+        setData(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
+```
+
+## Handle Submit
+
+
+```jsx
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        if (validate()) {
+            setProducts(prev =>
+                prev.map(item =>
+                    item.id === edit ? { ...item, ...product } : item
+                )
+            )
+            setProduct({
+                id: "",
+                images: [],
+                title: "",
+                brand: "",
+                category: "",
+                stock: "",
+                price: ""
+            })
+            handleClose()
+            toast.success('Product updated successfully');
+        }
+    }
+
+    const validate = () => {
+        const error = {};
+        const isEmpty = (value) => !value
+        const isTooShort = (value, minLength = 2) => value && value.trim().length < minLength;
+
+        if (isEmpty(product.title)) {
+            error.title = "title required";
+        } else if (isTooShort(product.title)) {
+            error.title = "title required";
+        }
+        if (isEmpty(product.images[0])) {
+            error.image = "image url required";
+        }
+
+        if (isEmpty(product.brand)) {
+            error.brand = "brand required";
+
+        }
+        if (isEmpty(product.stock)) {
+            error.stock = "stock required";
+
+        }
+        if (isEmpty(product.price)) {
+            error.price = "price required";
+
+        }
+        if (isEmpty(product.category)) {
+            error.category = "Category required";
+        }
+        setError(error);
+        return Object.keys(error).length === 0;
+    }
+
+```
+
+
+## validate
