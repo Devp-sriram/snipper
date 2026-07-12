@@ -20,43 +20,26 @@ const navItems = [
 
 function App() {
   return (
-    <div className="app-shell">
-      <header className="site-header" style={{backgroundColor:'#712cf9'}}>
-        <a className="brand" href="/" aria-label="Snipper home">
-          <span className="brand-mark">
-            <img src='rb.svg'/>
-          </span>
-          <span>
-            <strong style={{color:"white"}}>Bootstrap Snippets</strong>
-          </span>
-        </a>
+    <BrowserRouter>
+      <div className="app-shell">
+        <aside className="sidebar" aria-label="Documentation navigation">
+          <Link className="brand" to="/" aria-label="Bootstrap snippets home">
+            <span className="brand-mark">
+              <img src="/rb.svg" alt="" />
+            </span>
+            <strong>Bootstrap Snippets</strong>
+          </Link>
 
-        <label className="search-field" htmlFor="snippet-search">
-          <FiSearch aria-hidden="true" />
-          <input
-            id="snippet-search"
-            type="search"
-            placeholder="Search snippets"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </label>
-      </header>
-
-      <div className="workspace">
-        <aside className="sidebar" aria-label="Snippet navigation">
-          <nav>
-            <p className="sidebar-label">Categories</p>
-            {categories.map((category) => (
-              <button
-                className={category === activeCategory ? 'nav-item active' : 'nav-item'}
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
+          <nav className="doc-nav">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
               >
-                <FiHash aria-hidden="true" />
-                <span>{category}</span>
-              </button>
+                {item.label}
+              </NavLink>
             ))}
           </nav>
         </aside>
