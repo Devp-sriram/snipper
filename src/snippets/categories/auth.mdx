@@ -5,64 +5,250 @@ Use auth snippets for local demo login and sign-in flows. These examples use loc
 ## Sign in form
 
 ```jsx
+import './Signin.css'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Form from 'react-bootstrap/Form'
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+import { FaEyeSlash, FaEye } from "react-icons/fa";
+
+import Form from 'react-bootstrap/Form';
 
 export default function Signin() {
-  const navigate = useNavigate()
-  const [data, setData] = useState({ name: '', email: '', password: '' })
-  const [error, setError] = useState({})
+    const navigate = useNavigate();
 
-  const handleChange = ({ target }) => {
-    setData((current) => ({ ...current, [target.name]: target.value.trim() }))
-  }
+    const [showPw, setShowPw] = useState(false)
+    const [data, setData] = useState({
+        name: "",
+        email: "",
+        password: ""
+    })
+    const [error, setError] = useState({
+        name: "",
+        email: "",
+        password: ""
+    })
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    const users = JSON.parse(localStorage.getItem('auth')) || []
-    localStorage.setItem('auth', JSON.stringify([...users, data]))
-    navigate('/')
-  }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setData(prev => ({
+            ...prev,
+            [name]: name == 'email' || name == 'password' ? value.trim() : value
+        }))
+    }
 
-  return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Control name="name" value={data.name} onChange={handleChange} />
-      {error.name && <p className="text-danger">{error.name}</p>}
-      <Form.Control name="email" value={data.email} onChange={handleChange} />
-      {error.email && <p className="text-danger">{error.email}</p>}
-      <Form.Control name="password" type="password" value={data.password} onChange={handleChange} />
-      {error.password && <p className="text-danger">{error.password}</p>}
-      <button className="btn btn-primary w-100">Submit</button>
-      <Form.Text>Already signed up? <Link to="/">Login</Link></Form.Text>
-    </Form>
-  )
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validate()) {
+            let users = JSON.parse(localStorage.getItem('auth')) || [];
+            console.log(users)
+            users.push(data)
+            localStorage.setItem('auth', JSON.stringify(users))
+            setData({
+                name: "",
+                email: "",
+                password: ""
+            })
+            navigate('/')
+        }
+    }
+    const validate = () => {
+        const emailRegex = /^[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;;
+        const error = {};
+        if (!data.name || !data.name.trim()) error.name = "Name required";
+        if (!data.email || !data.name.trim()) {
+            error.email = "Email required"
+        } else if (!emailRegex.test(data.email)) {
+            error.email = "not a valid email";
+        }
+        if (!data.password || !data.password.trim()) {
+            error.password = 'Password required'
+        } else if (data.password.length < 8) {
+            error.password = "Password should be 8 or above characters";
+        }
+
+        setError(error);
+        console.log(error);
+        return Object.keys(error).length === 0;
+    };
+    return (
+        <section className='outbox d-flex justify-content-center align-items-center'>
+            <Form onSubmit={(e) => handleSubmit(e)} className='box border form rounded m-2 text-start'>
+                <h3 className='my-3 text-center'>Signin</h3>
+                <Form.Group className='form-group m-2 text-start'>
+                    <Form.Label className='p-2'>Name</Form.Label>
+                    <Form.Control type='text' name='name' value={data.name} onChange={(e) => handleChange(e)} />
+                </Form.Group>
+                {error.name && <p className='text-danger ms-2'>{error.name}</p>}
+                <Form.Group className='form-group m-2 text-start'>
+                    <Form.Label className='p-2'>Email</Form.Label>
+                    <Form.Control type='text' name='email' value={data.email} onChange={(e) => handleChange(e)} />
+                </Form.Group>
+                {error.email && <p className='text-danger ms-2'>{error.email}</p>}
+                <Form.Group className='form-group m-2 text-start position-relative'>
+                    <Form.Label className='p-2'>Password</Form.Label>
+                    <Form.Control type={showPw ? 'text' : 'password'} name='password' value={data.password} onChange={(e) => handleChange(e)} />
+                    {showPw ? <FaEyeSlash onClick={() => setShowPw(!showPw)} className='position-absolute' style={{ right: "10px", bottom: '10px' }} />
+                        : <FaEye onClick={() => setShowPw(!showPw)} className='position-absolute' style={{ right: "10px", bottom: '10px' }} />
+                    }
+                </Form.Group>
+                {error.password && <p className='text-danger ms-2'>{error.password}</p>}
+                <Form.Group className='m-2'>
+                    <button type='submit' className='w-100 btn btn-primary'>Submit</button>
+                    <Form.Text>Already signed up login here <Link to='/'>here</Link></Form.Text>
+                </Form.Group>
+            </Form>
+        </section>
+    )
 }
 ```
 
-## Auth form CSS
+## Signin form CSS
 
 ```css
 .outbox {
-  min-height: 100vh;
-  background: linear-gradient(90deg, #7dff9d 0%, #7dfce7 100%);
+    background: linear-gradient(90deg, #ae71ff 0%, #fc7ddc 100%);
+    min-height: 100vh;
 }
 
 .box {
-  width: 25%;
-  height: fit-content;
-  background-color: white;
+    background-color: white;
+    width: 25%;
+    height: fit-content;
 }
 
 @media screen and (width < 1024px) {
-  .box {
-    width: 50%;
-  }
+    .box {
+        width: 50%;
+    }
 }
 
 @media screen and (width < 768px) {
-  .box {
-    width: 100%;
-  }
+    .box {
+        width: 100%;
+    }
 }
 ```
+
+## Login form
+
+```
+import './Login.css'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import { FaEyeSlash , FaEye} from "react-icons/fa";
+
+export default function Login() {
+    const navigate = useNavigate();
+    const [showPw, setShowPw] = useState(false)
+    const [users, setUsers] = useState(JSON.parse(localStorage.getItem('auth')) || [])
+    const [data, setData] = useState({
+        email: "",
+        password: ""
+    })
+    const [error, setError] = useState({
+        email: "",
+        password: "",
+        auth: ""
+    })
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setData(prev => ({
+            ...prev,
+            [name]: value.trim()
+        }))
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        let user = users.find(user => user.email === data.email);
+        if (validate()) {
+            if (!user) {
+                setError(prev => ({ ...prev, auth: 'User not found' }))
+                console.log(error)
+                return
+            }
+
+            if (user.password === data.password) {
+                localStorage.setItem('loggedIn', JSON.stringify(user))
+                navigate('/home')
+            } else {
+                setError(prev => ({ ...prev, auth: "Password doesn't match" }))
+            }
+        }
+    }
+
+    const validate = () => {
+        const emailRegex = /^[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;;
+        const error = {};
+        if (!data.email || !data.email.trim()) {
+            error.email = "Email required"
+        } else if (!emailRegex.test(data.email)) {
+            error.email = "not a valid email";
+        }
+        if (!data.password || !data.password.trim()) {
+            error.password = 'Password required'
+        } else if (data.password.length < 8) {
+            error.password = "Password should be 8 or above characters";
+        }
+
+        setError(error);
+        return Object.keys(error).length === 0;
+    };
+    return (
+        <section className='outbox d-flex justify-content-center align-items-center'>
+            <Form onSubmit={(e) => handleSubmit(e)} className='box border form rounded m-2 text-start'>
+                <h3 className='my-3 text-center'>Login</h3>
+                <Form.Group className='form-group m-2 text-start'>
+                    <Form.Label className='p-2'>Email</Form.Label>
+                    <Form.Control type='text' name='email' value={data.email} onChange={(e) => handleChange(e)} />
+                </Form.Group>
+                    {error.email && <p className='text-danger ms-2'>{error.email}</p>}
+                <Form.Group className='form-group m-2 text-start position-relative'>
+                    <Form.Label className='p-2'>Password</Form.Label>
+                    <Form.Control type={showPw ? 'text' : 'password'} name='password' value={data.password} onChange={(e) => handleChange(e)} />
+                    {showPw ? <FaEyeSlash onClick={() => setShowPw(!showPw)} className='position-absolute' style={{ right: "10px", bottom: '10px' }} />
+                        : <FaEye onClick={() => setShowPw(!showPw)} className='position-absolute' style={{ right: "10px", bottom: '10px' }} />
+                    }
+                </Form.Group>
+                    {error.password && <p className='text-danger ms-2'>{error.password}</p>}
+                <Form.Group className='m-2 text-center'>
+                    {error.auth && <p className='text-danger'>{error.auth}</p>}
+                    <Button type='submit' className='w-100 btn btn-primary'>Submit</Button>
+                    <Form.Text >New user? signin <Link to='/signin'>here</Link></Form.Text>
+                </Form.Group>
+            </Form>
+        </section>
+    )
+}
+```
+
+## Login css
+```
+.outbox {
+    background: linear-gradient(90deg, #c59aff 0%, #ffadea 100%);
+    min-height: 100vh;
+}
+
+.box {
+    background-color: white;
+    width: 25%;
+    height: fit-content;
+}
+
+@media screen and (width < 1024px) {
+    .box {
+        width: 50%;
+    }
+}
+
+@media screen and (width < 768px) {
+    .box {
+        width: 100%;
+    }
+}
+``` 

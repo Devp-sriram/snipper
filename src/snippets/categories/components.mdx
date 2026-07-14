@@ -5,57 +5,133 @@ Use component snippets for reusable UI pieces that can move between pages.
 ## Header with offcanvas menu
 
 ```jsx
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Button, Dropdown, Offcanvas } from 'react-bootstrap'
-import { FaUserCircle } from 'react-icons/fa'
-import { HiOutlineMenu } from 'react-icons/hi'
+import { IconContext } from "react-icons";
+import { FaUserCircle } from "react-icons/fa";
+import { IoMdCart } from "react-icons/io";
+import { HiOutlineMenu } from "react-icons/hi";
+import {Button ,Offcanvas , Dropdown} from 'react-bootstrap';
 
-export default function Header() {
-  const [show, setShow] = useState(false)
-  const [creds, setCreds] = useState({})
+import { useEffect, useState, useMemo } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 
-  useEffect(() => {
-    setCreds(JSON.parse(localStorage.getItem('loggedIn')) || {})
-  }, [])
 
-  return (
-    <header className="d-flex px-4 p-3 justify-content-between border">
-      <Button className="hamburger btn btn-light" onClick={() => setShow(true)}><HiOutlineMenu /></Button>
-      <h2 className="mb-0 text-brand">Admin console</h2>
-      <Offcanvas show={show} onHide={() => setShow(false)}>
-        <Offcanvas.Body>
-          <Link to="/home" onClick={() => setShow(false)}>Home</Link>
-          <Link to="/home/users" onClick={() => setShow(false)}>Users</Link>
-          <Link to="/home/products" onClick={() => setShow(false)}>Products</Link>
-        </Offcanvas.Body>
-      </Offcanvas>
-      <Dropdown>
-        <Dropdown.Toggle variant="light"><FaUserCircle /> {creds?.name}</Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item href="/">Logout</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-    </header>
-  )
+function Header() {
+    const navigate = useNavigate()
+    const [show, setShow] = useState(false);
+    const [creds, setCreds] = useState({})
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    useEffect(() => {
+        setCreds(JSON.parse(localStorage.getItem('loggedIn')) || {});
+    }, [])
+
+    const logout = () => {
+        localStorage.removeItem('loggedIn')
+    }
+
+    return <header className="d-flex px-4 p-3 justify-content-between border top bg-primary-subtle">
+        <div className="d-flex gap-2 align-items-center">
+            <Button className='d-md-none btn btn-light' onClick={handleShow}><HiOutlineMenu /></Button>
+            <h2 className="mb-0 text-brand ">Admin console</h2>
+        </div>
+
+
+        <Offcanvas show={show} onHide={handleClose}>
+            <Offcanvas.Header closeButton>
+            </Offcanvas.Header>
+            <Offcanvas.Body>
+                <ul className="list-unstyled m-3 text-none ">
+                    <Link to="/home" onClick={()=>handleClose()}><li className='w-100 p-2 text-start'>Home</li></Link>
+                    <Link to="/home/users" onClick={()=>handleClose()}><li className='w-100 p-2 text-start'>Users</li></Link>
+                    <Link to="/home/products" onClick={()=>handleClose()}><li className='w-100 p-2 text-start'>Products</li></Link>
+                </ul>
+            </Offcanvas.Body>
+        </Offcanvas>
+        <IconContext.Provider value={{ size: "2rem", color: "black", className: "global-className-name" }}>
+            <div>
+
+                <Dropdown>
+                    <Dropdown.Toggle variant="light" id="dropdown-basic" className="d-flex align-items-center m-0 p-0 bg-transparent border-0">
+                        <div>
+                            <FaUserCircle />
+                            {creds?.name && <p className="mb-0" style={{fontSize:"12px"}}>{creds.name}</p>}
+                        </div>
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                        {creds?.name
+                            ? <>
+                                <Dropdown.Item href="/" onClick={() => logout()}>Logout</Dropdown.Item>
+                            </>
+                            : <>
+                                <Dropdown.Item href="/signin">Signin</Dropdown.Item>
+                                <Dropdown.Item href="/">Login</Dropdown.Item>
+                            </>
+                        }
+                    </Dropdown.Menu>
+                </Dropdown>
+
+            </div>
+        </IconContext.Provider>
+    </header >
 }
+
+export default Header
 ```
 
 ## Sidebar links
 
 ```jsx
-import { Link } from 'react-router-dom'
 import './SideBar.css'
+import { Link , useLocation } from "react-router-dom"
 
-export default function Sidebar() {
-  return (
-    <aside className="border-end aside">
-      <ul className="list-unstyled m-3 text-brand">
-        <Link to="/home"><li className="w-100 p-2 text-start">Home</li></Link>
-        <Link to="/home/users"><li className="w-100 p-2 text-start">Users</li></Link>
-        <Link to="/home/products"><li className="w-100 p-2 text-start">Products</li></Link>
-      </ul>
+function Sidebar() {
+    const location = useLocation()
+    return <aside className='border-end aside'>
+        <ul className="list-unstyled m-3 text-brand">
+            <Link to="/home"><li className={`w-100 p-2 text-start ${location.pathname == '/home' && `text-white bg-primary`}`}>Home</li></Link>
+            <Link to="/home/users"><li className={`w-100 p-2 text-start ${location.pathname == '/home/users' && `text-white bg-primary`}`}>Users</li></Link>
+            <Link to="/home/products"><li className={`w-100 p-2 text-start ${location.pathname == '/home/products' && `text-white bg-primary`}`}>Products</li></Link>
+        </ul>
     </aside>
-  )
+}
+
+export default Sidebar
+```
+
+## Sidebar links css
+
+```css
+aside {
+    display: none;
+    width: 200px;
+    min-height: 100vh;
+    background-color: white;
+}
+
+ul a {
+    text-decoration: none;
+    color: var(--brand);
+    font-weight:500;
+}
+
+li {
+    border-radius: 10px;
+}
+
+ul a:hover {
+    color: white;
+
+    li {
+        background-color: var(--bs-primary);
+    }
+}
+
+@media screen and ( width > 768px) {
+    aside {
+        display: block;
+         width: 200px;
+    }
 }
 ```
